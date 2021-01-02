@@ -7,7 +7,7 @@ public class Ball {
 	double x_r, y_r; // bewegungs richtung
 	private Image image;
 	boolean visible;
-	int radius;
+	public static int RADIUS;
 	private boolean moving = true;
 
 	double energy;
@@ -38,7 +38,7 @@ public class Ball {
 		this.y = y;
 		x_r = 0;
 		y_r = 0;
-		radius = image.getHeight(null) / 2;
+		Ball.RADIUS = image.getHeight(null) / 2;
 		energy = 5;
 		speed = 1;
 		this.name = name;
@@ -92,25 +92,25 @@ public class Ball {
 
 	public void moveRichtung() {
 		// rechtem rand
-		if ((this.x >= (Constants.widthJpanel - Constants.x_Abstand - 20 - radius))) {
+		if ((this.x >= (PoolTable.WALL_RIGHT_INNER- Ball.RADIUS))) {
 			x_r = -1 * x_r;
 		}
 		// kollision mit oberem
-		if (this.y <= (Constants.y_Abstand + 20 + radius)) {
+		if (this.y <= (PoolTable.WALL_UP_INNER + Ball.RADIUS)) {
 			y_r = -1 * y_r;
 		}
 		// linkem rand
-		if ((this.x <= (Constants.x_Abstand + 20 + radius))) {
+		if ((this.x <= (PoolTable.WALL_LEFT_INNER + Ball.RADIUS))) {
 			x_r = -1 * x_r;
 		}
 		// kollision mit unterem
-		if ((this.y >= (Constants.heightJpanel - Constants.y_Abstand - 20 - radius))) {
+		if ((this.y >= (PoolTable.WALL_DOWN_INNER - Ball.RADIUS))) {
 			y_r = -1 * y_r;
 		}
 		
 		if (energy > 0) {
-			this.x +=x_r*energy;
-			this.y += y_r*energy;
+			this.x += x_r * energy;
+			this.y += y_r * energy;
 		}
 		else if (energy <= 0) {
 			canMove = false;
@@ -122,7 +122,7 @@ public class Ball {
 	}
 
 	public Circle getBounds() {
-		return new Circle((int) x, (int) y, radius);
+		return new Circle((int) x, (int) y, Ball.RADIUS);
 	}
 
 	/**
