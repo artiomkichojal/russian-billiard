@@ -21,10 +21,12 @@ public class Circle {
 //	    System.out.println("ydiff" + yDiff);
 	    double distance = Math.sqrt((Math.pow(xDiff, 2) + Math.pow(yDiff, 2)));
 //	    System.out.println("distance " + distance);
-	    collisionPoint = new Point((int)(x + radius), (int)(y + radius));
+		collisionPoint = new Point((int)(x + radius), (int)(y + radius));
+		circle.collisionPoint = new Point((int)(x + radius), (int)(y + radius)); 
 	    boolean res = distance < (radius + circle.getRadius());
 	    if (res) {
-	    	//System.out.println("Kollision");
+
+	    	System.out.println("Kollision at " + collisionPoint.toString());
 		}
 	    return res;
 	}

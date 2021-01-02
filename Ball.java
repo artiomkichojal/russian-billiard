@@ -2,7 +2,7 @@ import java.awt.Image;
 
 import javax.swing.ImageIcon;
 
-public class Ball {
+public class Ball extends Circle{
 	private double x, y;
 	double x_r, y_r; // bewegungs richtung
 	private Image image;
@@ -24,6 +24,7 @@ public class Ball {
 	 * @param ballColor
 	 */
 	public Ball(int x, int y, String ballColor, String name) {
+		super(x, y, 0);
 		this.setBallColor(ballColor);
 		// System.out.println(pooltable.getWidth());
 		if (ballColor.toLowerCase().equals("white")) {
@@ -39,6 +40,7 @@ public class Ball {
 		x_r = 0;
 		y_r = 0;
 		Ball.RADIUS = image.getHeight(null) / 2;
+		radius = Ball.RADIUS;
 		energy = 5;
 		speed = 1;
 		this.name = name;

@@ -100,7 +100,11 @@ public class PoolTable extends JPanel implements ActionListener, MouseListener {
 			boolean kollision = false;
 			for (int j = 0; j < balls.size(); j++) {
 				Ball secBall = balls.get(j);
-				if (firstBall.getBounds().hasCollision(secBall.getBounds()) && !firstBall.equals(secBall)) {
+				
+				if (firstBall.hasCollision(secBall) && !firstBall.equals(secBall)) {
+					firstBall.hasCollision(secBall);
+					System.out.println("collision point first " + firstBall.collisionPoint.getX() + " " + firstBall.collisionPoint.getY());
+					System.out.println("collision point sec " + secBall.collisionPoint.x + " " + secBall.collisionPoint.y);
 					double xx =  (secBall.getX() - firstBall.getX());
 					double yy = (secBall.getY() - firstBall.getY());
 					double laenge = Math.sqrt(xx * xx + yy * yy);
@@ -143,6 +147,10 @@ public class PoolTable extends JPanel implements ActionListener, MouseListener {
 		repaint();
 
 	}
+
+	// getCollisionPoint(Ball ball1, Ball ball2) {
+		
+	// }
 
 	private void setWallOuterCoordinates() {
 		PoolTable.WALL_LEFT_OUTER = (RussianPool.WINDOW_WIDTH - table.getWidth(null)) / 2;
