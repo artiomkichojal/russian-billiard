@@ -9,7 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-
+import java.awt.Point;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -62,7 +62,7 @@ public class PoolTable extends JPanel implements ActionListener, MouseListener {
 		spawnBalls();
 
 		setDoubleBuffered(true);
-		timer = new Timer(10, this);
+		timer = new Timer(1, this);
 		timer.start();
 		addMouseListener(this);
 
@@ -85,7 +85,8 @@ public class PoolTable extends JPanel implements ActionListener, MouseListener {
 				(int) ((WALL_DOWN_INNER + WALL_UP_INNER) / 2));
 
 		if (isTageting) {
-			// zweiter punkt muss über die geradengleichung g = p1 + t * (p2 - p1) ermittelt werden
+			// zweiter punkt muss über die geradengleichung g = p1 + t * (p2 - p1) ermittelt
+			// werden
 			g2d.drawLine((int) maus_loc_x, (int) maus_loc_y,
 					(int) maus_loc_x + ((int) mainBall.getX() - (int) maus_loc_x) * 10,
 					(int) maus_loc_y + ((int) mainBall.getY() - (int) maus_loc_y) * 10);
@@ -100,40 +101,75 @@ public class PoolTable extends JPanel implements ActionListener, MouseListener {
 			boolean kollision = false;
 			for (int j = 0; j < balls.size(); j++) {
 				Ball secBall = balls.get(j);
-				
-				if (firstBall.hasCollision(secBall) && !firstBall.equals(secBall)) {
-					firstBall.hasCollision(secBall);
-					System.out.println("collision point first " + firstBall.collisionPoint.getX() + " " + firstBall.collisionPoint.getY());
-					System.out.println("collision point sec " + secBall.collisionPoint.x + " " + secBall.collisionPoint.y);
-					double xx =  (secBall.getX() - firstBall.getX());
-					double yy = (secBall.getY() - firstBall.getY());
-					double laenge = Math.sqrt(xx * xx + yy * yy);
-					System.out.println("laenge von sec " + laenge);
+
+				if (!firstBall.equals(secBall) && firstBall.hasCollision(secBall)) {
+					// firstBall.hasCollision(secBall);
+					System.out.println("Collisiion of " + firstBall.getName() + " " + secBall.getName());
+					System.out.println("collision point first " + firstBall.collisionPoint.getX() + " "
+							+ firstBall.collisionPoint.getY());
+					System.out.println(
+							"collision point sec " + secBall.collisionPoint.x + " " + secBall.collisionPoint.y);
+
+					double normalVectorX = (secBall.getX() - firstBall.getX());
+					double normalVectorY = (secBall.getY() - firstBall.getY());
+					double laenge = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
+
+					// Normale normiert (laenge 1)
+					double normalVectorNormiertX = normalVectorX / laenge;
+					double normalVectorNormiertY = normalVectorY / laenge;
+
+					System.out.println("normalvektor " + normalVectorX + " " + normalVectorY);
+
+					// Tangente
+					double tangentenVectorX = -normalVectorNormiertY;
+					double tangentenVectorY = normalVectorNormiertX;
+
+					// Dot Product Tangent
+					double dpTan1 = firstBall.x_r * tangentenVectorX + firstBall.y_r * tangentenVectorY;
+					double dpTan2 = secBall.x_r * tangentenVectorX + secBall.y_r * tangentenVectorY;
+
+					// Dot Product Normal
+					double dpNorm1 = firstBall.x_r * normalVectorNormiertX + firstBall.y_r * normalVectorNormiertY;
+					double dpNorm2 = secBall.x_r * normalVectorNormiertX + secBall.y_r * normalVectorNormiertY;
+
+					// Conservation of Momentum (Energieerhaltung)
+					double m1 = (dpNorm1 * (firstBall.mass - secBall.mass) + 2.0 * secBall.mass * dpNorm2)
+							/ (firstBall.mass + secBall.mass);
+					double m2 = (dpNorm2 * (secBall.mass - firstBall.mass) + 2 * firstBall.mass * dpNorm1)
+							/ (firstBall.mass + secBall.mass);
 
 
+					firstBall.setX_r(tangentenVectorX * dpTan1 + normalVectorNormiertX * m1);
+					firstBall.setY_r(tangentenVectorY * dpTan1 + normalVectorNormiertY * m1);
 
-					secBall.setX_r((double) xx / laenge);
-					secBall.setY_r((double) yy / laenge);
+					secBall.setX_r(tangentenVectorX * dpTan2 + normalVectorNormiertX * m2);
+					secBall.setY_r(tangentenVectorY * dpTan2 + normalVectorNormiertY * m2);
 
-					firstBall.setX_r(-secBall.getY_r());
-					firstBall.setY_r(secBall.getX_r());
+					// this.setNewVelocityVector(firstBall, secBall);
+					// this.setNewVelocityVector(secBall, firstBall);
 
-					firstBall.setEnergy(firstBall.getEnergy() * 0.9);
-					firstBall.moveRichtung();
+					// double xx = (secBall.getX() - firstBall.getX());
+					// double yy = (secBall.getY() - firstBall.getY());
+					// double laenge = Math.sqrt(xx * xx + yy * yy);
+					// System.out.println("laenge von sec " + laenge);
 
-					secBall.setEnergy(firstBall.getEnergy());
+					// secBall.setX_r((double) xx / laenge);
+					// secBall.setY_r((double) yy / laenge);
+
+					// firstBall.setX_r(-secBall.getY_r());
+					// firstBall.setY_r(secBall.getX_r());
+
+					// firstBall.setEnergy(firstBall.getEnergy() * 0.9);
+					// secBall.setEnergy(firstBall.getEnergy());
 					secBall.setCannMove(true);
 					secBall.moveRichtung();
 
+					firstBall.setCannMove(true);
+					firstBall.moveRichtung();
+
 					kollision = true;
-					System.out.println(firstBall.getName() + " " + secBall.getName());
 
 				}
-				// if (kollision) {
-
-				// 	firstBall.setEnergy(firstBall.getEnergy() / 5);
-				// 	firstBall.moveRichtung();
-				// }
 			}
 
 		}
@@ -141,6 +177,10 @@ public class PoolTable extends JPanel implements ActionListener, MouseListener {
 		for (Ball actBall : balls) {
 			if (actBall.getCanMove()) {
 				actBall.moveRichtung();
+				// if (actBall.getName().equals("main")) {
+				// System.out.println(actBall.getX()+ " " + actBall.getY());
+				// //actBall.moveRichtung();
+				// }
 			}
 		}
 
@@ -148,8 +188,39 @@ public class PoolTable extends JPanel implements ActionListener, MouseListener {
 
 	}
 
-	// getCollisionPoint(Ball ball1, Ball ball2) {
+	private void setNewVelocityVector(Ball firstBall, Ball secBall) {
+		double normalVectorX = (secBall.getX() - firstBall.getX());
+		double normalVectorY = (secBall.getY() - firstBall.getY());
+		double laenge = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
+
+		double normalVectorNormiertX = (1 / laenge) * normalVectorX;
+		double normalVectorNormiertY = (1 / laenge) * normalVectorY;
+
+		System.out.println("normalvektor " + normalVectorX + " " + normalVectorY);
+
+		double v1oX = firstBall.x_r - normalVectorNormiertX * (normalVectorNormiertX * firstBall.x_r);
+		double v1oY = firstBall.y_r - normalVectorNormiertY * (normalVectorNormiertY * firstBall.y_r);
+
+		double v2pX = normalVectorNormiertX * (normalVectorNormiertX * secBall.x_r);
+		double v2pY = normalVectorNormiertY * (normalVectorNormiertY * secBall.y_r);
+
 		
+
+		double vNewX = v1oX + v2pX;
+		double vNewY = v1oY + v2pY;
+		System.out.println("old vel " + firstBall.getX_r() + " " + firstBall.getY_r());
+		System.out.println("new vel " + vNewX + " " + vNewY);
+		firstBall.setX_r(vNewX);
+		firstBall.setY_r(vNewY);
+
+	}
+
+	public Point getNormalVector(Ball first, Ball second) {
+		return new Point((int) (second.getX() - first.getX()), (int) (second.getY() - first.getY()));
+	}
+
+	// getCollisionPoint(Ball ball1, Ball ball2) {
+
 	// }
 
 	private void setWallOuterCoordinates() {
@@ -172,9 +243,9 @@ public class PoolTable extends JPanel implements ActionListener, MouseListener {
 
 		balls.add(mainBall);
 		balls.add(secondBall);
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 1; i <= 3; i++) {
 
-			Ball b = new Ball((int) WALL_RIGHT_INNER - 100 - 25 * i, (int) ((WALL_DOWN_INNER + WALL_UP_INNER) / 2),
+			Ball b = new Ball((int) WALL_RIGHT_INNER - 100 - 30 * i, (int) ((WALL_DOWN_INNER + WALL_UP_INNER) / 2),
 					"yellow", String.valueOf(i));
 			balls.add(b);
 		}

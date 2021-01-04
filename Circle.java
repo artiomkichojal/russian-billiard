@@ -23,11 +23,11 @@ public class Circle {
 //	    System.out.println("distance " + distance);
 		collisionPoint = new Point((int)(x + radius), (int)(y + radius));
 		circle.collisionPoint = new Point((int)(x + radius), (int)(y + radius)); 
-	    boolean res = distance < (radius + circle.getRadius());
-	    if (res) {
+	    boolean res = (distance - 2) <= (radius + circle.getRadius());
+	    // if (res) {
 
-	    	System.out.println("Kollision at " + collisionPoint.toString());
-		}
+	    // 	System.out.println("Kollision at " + collisionPoint.toString());
+		// }
 	    return res;
 	}
 	

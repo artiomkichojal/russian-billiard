@@ -3,7 +3,7 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 
 public class Ball extends Circle{
-	private double x, y;
+	// private double x, y;
 	double x_r, y_r; // bewegungs richtung
 	private Image image;
 	boolean visible;
@@ -15,6 +15,7 @@ public class Ball extends Circle{
 	boolean canMove = false;
 	private String ballColor;
 	private String name;
+	double mass = 1;
 
 	/**
 	 * x,y ist Mittelpunkt
@@ -35,8 +36,6 @@ public class Ball extends Circle{
 			image = ii.getImage();
 		}
 		visible = true;
-		this.x = x;
-		this.y = y;
 		x_r = 0;
 		y_r = 0;
 		Ball.RADIUS = image.getHeight(null) / 2;
@@ -44,6 +43,7 @@ public class Ball extends Circle{
 		energy = 5;
 		speed = 1;
 		this.name = name;
+		this.mass = 1;
 
 	}
 
@@ -68,14 +68,6 @@ public class Ball extends Circle{
 		return this.name.equals(b.name);
 	}
 
-	public double getX() {
-		return x;
-	}
-
-	public double getY() {
-		return y;
-	}
-
 	public Image getImage() {
 		return image;
 	}
@@ -96,30 +88,33 @@ public class Ball extends Circle{
 		// rechtem rand
 		if ((this.x >= (PoolTable.WALL_RIGHT_INNER- Ball.RADIUS))) {
 			x_r = -1 * x_r;
+			energy *= 0.98;
 		}
 		// kollision mit oberem
 		if (this.y <= (PoolTable.WALL_UP_INNER + Ball.RADIUS)) {
 			y_r = -1 * y_r;
+			energy *= 0.98;
 		}
 		// linkem rand
 		if ((this.x <= (PoolTable.WALL_LEFT_INNER + Ball.RADIUS))) {
 			x_r = -1 * x_r;
+			energy *= 0.98;
 		}
 		// kollision mit unterem
 		if ((this.y >= (PoolTable.WALL_DOWN_INNER - Ball.RADIUS))) {
 			y_r = -1 * y_r;
+			energy *= 0.98;
 		}
 		
 		if (energy > 0) {
 			this.x += x_r * energy;
 			this.y += y_r * energy;
 		}
-		else if (energy <= 0) {
+		
+		else if ((x_r * energy) <= 0.0001 && (y_r * energy) <= 0.0001) {
 			canMove = false;
-			energy = 1;
 		} 
-		//System.out.println(ballColor + " " + energy);
-		energy -= 0.001;
+		energy -= 0.005;
 		
 	}
 
